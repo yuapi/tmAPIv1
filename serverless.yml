@@ -1,0 +1,73 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: yuapi
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: travelmakers
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: v1
+
+custom:
+  config: ${file(./config.json)}
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ap-northeast-2
+  vpc:
+    securityGroupIds:
+      - sg-042109b54cc2715e7
+    subnetIds:
+      - subnet-03d0b9e555af35e84
+      - subnet-0c3cea5885053b83c
+  deploymentBucket:
+    name: ${self:custom.config.aws.bucketName}
+  environment:
+    DB_HOST: ${self:custom.config.db.DB_HOST}
+    DB_USER: ${self:custom.config.db.DB_USER}
+    DB_PASSWORD: ${self:custom.config.db.DB_PASSWORD}
+    DB_NAME: ${self:custom.config.db.DB_NAME}
+    DB_PORT: ${self:custom.config.db.DB_PORT}
+    google_api_key: ${self:custom.config.google.api_key}
+
+functions:
+  hello:
+    handler: helloHandler.hello
+    events:
+      - http:
+          path: /v1/hello
+          method: GET
+  listPosts:
+    handler: postHandler.listPosts
+    events:
+      - http:
+          path: /v1/post
+          method: GET
+  createPost:
+    handler: postHandler.createPost
+    events:
+      - http:
+          path: /v1/post
+          method: POST
+  readPost:
+    handler: postHandler.readPost
+    events:
+      - http:
+          path: /v1/post/{postId}
+          method: GET
+  updatePost:
+    handler: postHandler.updatePost
+    events:
+      - http:
+          path: /v1/post/{postId}
+          method: PUT
+  deletePost:
+    handler: postHandler.deletePost
+    events:
+      - http:
+          path: /v1/post/{postId}
+          method: DELETE
+  chat:
+    handler: chatHandler.chat
+    events:
+      - http:
+          path: /v1/chat
+          method: POST
