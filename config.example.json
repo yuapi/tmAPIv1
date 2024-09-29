@@ -10,7 +10,9 @@
 		"DB_NAME": "<DB_NAME>",
 		"DB_PORT": "<DB_PORT>"
 	},
-	"google": {
-		"api_key": "<Google_API_Key>"
+	"chat": {
+		"google_key": "<Google_API_Key>",
+		"openai_key": "<OpenAI_API_Key>"
 	}
 }
+

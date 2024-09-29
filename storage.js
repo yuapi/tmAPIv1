@@ -18,97 +18,113 @@ function getConnection() {
 	});
 }
 
-exports.insert = async (post) => {
-	await getConnection()
-		.then(async connection => {
-			await connection.execute(
-				'INSERT INTO post (userid, title, content, created, modified) VALUES (?, ?, ?, CURRENT_TIMESTAMP(), NULL)',
-				[post.userId, post.title, post.content]
-			)
-		})
-		.catch(error => {
-			if (/Duplicate entry/.test(error.message)) return false
-			throw error;
-		})
-
-	return true;
+exports.postdb = {
+	insert: async (post) => {
+		await getConnection()
+			.then(async connection => {
+				await connection.execute(
+					'INSERT INTO post (userid, title, content, created, modified) VALUES (?, ?, ?, CURRENT_TIMESTAMP(), NULL)',
+					[post.userId, post.title, post.content]
+				)
+			})
+			.catch(error => {
+				if (/Duplicate entry/.test(error.message)) return false
+				throw error;
+			})
+	
+		return true;
+	},
+	select: async (postId) => {
+		const post = await getConnection()
+			.then(async connection => {
+				const rows = await connection.execute(
+					'SELECT * FROM post WHERE postid = ?',
+					[postId]
+				);
+	
+				const row = rows[0][0] ?? [];
+				if (!row) return null;
+	
+				return {
+					postId: row['postid'],
+					userId: row['userid'],
+					title: row['title'],
+					content: row['content'],
+					created: row['created'],
+					modified: row['modified']
+				}
+			})
+			.catch(error => {
+				console.log(error);
+			})
+	
+		return post;
+	},
+	update: async (postId, newPost) => {
+		const response = await getConnection()
+			.then(async connection => {
+				const ok = await connection.execute(
+					'UPDATE post SET title = ?, content = ?, modified = CURRENT_TIMESTAMP() WHERE postid = ?',
+					[newPost.title, newPost.content, postId]
+				)
+				return ok[0];
+			})
+			.catch(error => {
+				console.log(error);
+			})
+			
+		return response.affectedRows === 1;
+	},
+	remove: async (postId) => {
+		await getConnection()
+			.then(async connection => {
+				await connection.execute(
+					'DELETE FROM post WHERE postid = ?',
+					[postId]
+				)
+			})
+			.catch(error => {
+				console.log(error);
+			})
+	},
+	list: async () => {
+		const posts = await getConnection()
+			.then(async connection => {
+				const rows = await connection.execute(
+					'SELECT * FROM post ORDER BY created DESC'
+				)
+	
+				return (rows[0] ?? []).map(row => ({
+					postId: row['postid'],
+					userId: row['userid'],
+					title: row['title'],
+					content: row['content'],
+					created: row['created'],
+					modified: row['modified']
+				}))
+			})
+			.catch(error => {
+				console.log(error);
+			})
+	
+		return posts;
+	}
 }
 
-exports.select = async (postId) => {
-	const post = await getConnection()
-		.then(async connection => {
-			const rows = await connection.execute(
-				'SELECT * FROM post WHERE postid = ?',
-				[postId]
-			);
+exports.profiledb = {
+	insert: async (profile) => {
+		return true;
+	},
+	selectById: async (userId) => {
+		return user;
+	},
+	selectBySub: async (sub) => {
+		return user;
+	},
+	update: async (userId, newProfile) => {
 
-			const row = rows[0][0] ?? [];
-			if (!row) return null;
+	},
+	remove: async (userId) => {
 
-			return {
-				postId: row['postid'],
-				userId: row['userid'],
-				title: row['title'],
-				content: row['content'],
-				created: row['created'],
-				modified: row['modified']
-			}
-		})
-		.catch(error => {
-			console.log(error);
-		})
-
-	return post;
-}
-
-exports.update = async (postId, newPost) => {
-	const response = await getConnection()
-		.then(async connection => {
-			const ok = await connection.execute(
-				'UPDATE post SET title = ?, content = ?, modified = CURRENT_TIMESTAMP() WHERE postid = ?',
-				[newPost.title, newPost.content, postId]
-			)
-			return ok[0];
-		})
-		.catch(error => {
-			console.log(error);
-		})
-		
-	return response.affectedRows === 1;
-}
-
-exports.remove = async (postId) => {
-	await getConnection()
-		.then(async connection => {
-			await connection.execute(
-				'DELETE FROM post WHERE postid = ?',
-				[postId]
-			)
-		})
-		.catch(error => {
-			console.log(error);
-		})
-}
-
-exports.list = async () => {
-	const posts = await getConnection()
-		.then(async connection => {
-			const rows = await connection.execute(
-				'SELECT * FROM post ORDER BY created DESC'
-			)
-
-			return (rows[0] ?? []).map(row => ({
-				postId: row['postid'],
-				userId: row['userid'],
-				title: row['title'],
-				content: row['content'],
-				created: row['created'],
-				modified: row['modified']
-			}))
-		})
-		.catch(error => {
-			console.log(error);
-		})
-
-	return posts;
+	}
 }

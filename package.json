@@ -9,8 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.657.0",
     "@google/generative-ai": "^0.17.1",
     "mysql2": "^3.11.0",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "openai": "^4.63.0"
   }
 }

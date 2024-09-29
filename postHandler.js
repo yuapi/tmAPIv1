@@ -1,11 +1,11 @@
-const storage = require('./storage.js');
+const { postdb } = require('./storage.js');
 
 exports.createPost = async (event) => {
 	if (!event.body) return { statusCode: 404 };
 
 	const { userId, title, content } = JSON.parse(event.body);
 
-	const res = await storage.insert({ userId, title, content });
+	const res = await postdb.insert({ userId, title, content });
 	if (!res) return { statusCode: 400 };
 
 	return {
@@ -17,7 +17,7 @@ exports.createPost = async (event) => {
 exports.readPost = async (event) => {
 	if (!event.pathParameters || !event.pathParameters["postId"]) return { statusCode: 404 };
 
-	const post = await storage.select(event.pathParameters.postId);
+	const post = await postdb.select(event.pathParameters.postId);
 	if (!post) return { statusCode: 404 };
 
 	return {
@@ -32,7 +32,7 @@ exports.updatePost = async (event) => {
 	const postId = event.pathParameters.postId;
 	const { title, content } = JSON.parse(event.body);
 
-	if (!(await storage.update(postId, { title, content }))) return { statusCode: 400 };
+	if (!(await postdb.update(postId, { title, content }))) return { statusCode: 400 };
 
 	return {
 		statusCode: 200,
@@ -43,13 +43,13 @@ exports.updatePost = async (event) => {
 exports.deletePost = async (event) => {
 	if (!event.pathParameters || !event.pathParameters["postId"]) return { statusCode: 404 };
 
-	await storage.remove(event.pathParameters.postId);
+	await postdb.remove(event.pathParameters.postId);
 
 	return { statusCode: 200 };
 }
 
 exports.listPosts = async (event) => {
-	const postList = await storage.list();
+	const postList = await postdb.list();
 	
 	return {
 		statusCode: 200,
