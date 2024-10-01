@@ -111,7 +111,7 @@ exports.postdb = {
 	}
 }
 
-exports.profiledb = {
+exports.userdb = {
 	insert: async (profile) => {
 		return true;
 	},
@@ -122,7 +122,7 @@ exports.profiledb = {
 		return user;
 	},
 	update: async (userId, newProfile) => {
-
+		return affectedRows === 1;
 	},
 	remove: async (userId) => {
 
