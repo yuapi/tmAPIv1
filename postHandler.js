@@ -3,9 +3,9 @@ const { postdb } = require('./storage.js');
 exports.createPost = async (event) => {
 	if (!event.body) return { statusCode: 404 };
 
-	const { userId, title, content } = JSON.parse(event.body);
+	const { userid, title, content } = JSON.parse(event.body);
 
-	const res = await postdb.insert({ userId, title, content });
+	const res = await postdb.insert({ userid, title, content });
 	if (!res) return { statusCode: 400 };
 
 	return {
@@ -15,10 +15,10 @@ exports.createPost = async (event) => {
 }
 
 exports.readPost = async (event) => {
-	if (!event.pathParameters || !event.pathParameters["postId"]) return { statusCode: 404 };
+	if (!event.pathParameters || !event.pathParameters["id"]) return { statusCode: 404 };
 
-	const post = await postdb.select(event.pathParameters.postId);
-	if (!post) return { statusCode: 404 };
+	const post = await postdb.select(event.pathParameters.id);
+	if (!post) return { statusCode: 400 };
 
 	return {
 		statusCode: 200,
@@ -27,12 +27,12 @@ exports.readPost = async (event) => {
 }
 
 exports.updatePost = async (event) => {
-	if (!event.body || !event.pathParameters || !event.pathParameters["postId"]) return { statusCode: 404 };
+	if (!event.body || !event.pathParameters || !event.pathParameters["id"]) return { statusCode: 404 };
 
-	const postId = event.pathParameters.postId;
+	const id = event.pathParameters.id;
 	const { title, content } = JSON.parse(event.body);
 
-	if (!(await postdb.update(postId, { title, content }))) return { statusCode: 400 };
+	if (!(await postdb.update(id, { title, content }))) return { statusCode: 400 };
 
 	return {
 		statusCode: 200,
@@ -41,9 +41,9 @@ exports.updatePost = async (event) => {
 }
 
 exports.deletePost = async (event) => {
-	if (!event.pathParameters || !event.pathParameters["postId"]) return { statusCode: 404 };
+	if (!event.pathParameters || !event.pathParameters["id"]) return { statusCode: 404 };
 
-	await postdb.remove(event.pathParameters.postId);
+	await postdb.remove(event.pathParameters.id);
 
 	return { statusCode: 200 };
 }
@@ -56,3 +56,5 @@ exports.listPosts = async (event) => {
 		body: JSON.stringify({ postList: postList })
 	};
 }
+
+

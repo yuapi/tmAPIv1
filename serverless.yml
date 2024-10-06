@@ -52,19 +52,43 @@ functions:
     handler: postHandler.readPost
     events:
       - http:
-          path: /v1/post/{postId}
+          path: /v1/post/{id}
           method: GET
   updatePost:
     handler: postHandler.updatePost
     events:
       - http:
-          path: /v1/post/{postId}
+          path: /v1/post/{id}
           method: PUT
   deletePost:
     handler: postHandler.deletePost
     events:
       - http:
-          path: /v1/post/{postId}
+          path: /v1/post/{id}
+          method: DELETE
+  createUser:
+    handler: userHandler.createUser
+    events:
+      - http:
+          path: /v1/user
+          method: POST
+  readUser:
+    handler: userHandler.readUser
+    events:
+      - http:
+          path: /v1/user/{id}
+          method: GET
+  updateUser:
+    handler: userHandler.updateUser
+    events:
+      - http:
+          path: /v1/user/{id}
+          method: PUT
+  deleteUser:
+    handler: userHandler.deleteUser
+    events:
+      - http:
+          path: /v1/user/{id}
           method: DELETE
   chat:
     handler: chatHandler.chat

@@ -1,4 +1,4 @@
-const { gemini } = require('./googleAI.js')
+const { gemini } = require('./chatmodel.js')
 
 exports.getSession = async (event) => {
 	return {

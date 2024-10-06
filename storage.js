@@ -24,7 +24,7 @@ exports.postdb = {
 			.then(async connection => {
 				await connection.execute(
 					'INSERT INTO post (userid, title, content, created, modified) VALUES (?, ?, ?, CURRENT_TIMESTAMP(), NULL)',
-					[post.userId, post.title, post.content]
+					[post.userid, post.title, post.content]
 				)
 			})
 			.catch(error => {
@@ -34,20 +34,20 @@ exports.postdb = {
 	
 		return true;
 	},
-	select: async (postId) => {
+	select: async (id) => {
 		const post = await getConnection()
 			.then(async connection => {
 				const rows = await connection.execute(
-					'SELECT * FROM post WHERE postid = ?',
-					[postId]
+					'SELECT * FROM post WHERE id = ?',
+					[id]
 				);
 	
 				const row = rows[0][0] ?? [];
 				if (!row) return null;
 	
 				return {
-					postId: row['postid'],
-					userId: row['userid'],
+					id: row['id'],
+					userid: row['userid'],
 					title: row['title'],
 					content: row['content'],
 					created: row['created'],
@@ -60,12 +60,12 @@ exports.postdb = {
 	
 		return post;
 	},
-	update: async (postId, newPost) => {
+	update: async (id, newPost) => {
 		const response = await getConnection()
 			.then(async connection => {
 				const ok = await connection.execute(
-					'UPDATE post SET title = ?, content = ?, modified = CURRENT_TIMESTAMP() WHERE postid = ?',
-					[newPost.title, newPost.content, postId]
+					'UPDATE post SET title = ?, content = ?, modified = CURRENT_TIMESTAMP() WHERE id = ?',
+					[newPost.title, newPost.content, id]
 				)
 				return ok[0];
 			})
@@ -75,12 +75,12 @@ exports.postdb = {
 			
 		return response.affectedRows === 1;
 	},
-	remove: async (postId) => {
+	remove: async (id) => {
 		await getConnection()
 			.then(async connection => {
 				await connection.execute(
-					'DELETE FROM post WHERE postid = ?',
-					[postId]
+					'DELETE FROM post WHERE id = ?',
+					[id]
 				)
 			})
 			.catch(error => {
@@ -95,8 +95,8 @@ exports.postdb = {
 				)
 	
 				return (rows[0] ?? []).map(row => ({
-					postId: row['postid'],
-					userId: row['userid'],
+					id: row['id'],
+					userid: row['userid'],
 					title: row['title'],
 					content: row['content'],
 					created: row['created'],
@@ -112,19 +112,72 @@ exports.postdb = {
 }
 
 exports.userdb = {
-	insert: async (profile) => {
+	insert: async (user) => {
+		await getConnection()
+			.then(async connection => {
+				await connection.execute(
+					'INSERT INTO user (id, nickname, email, gender, birthday, regdate) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP())',
+					[user.id, user.nickname, user.email, user.gender, user.birthday]
+				)
+			})
+			.catch(error => {
+				if (/Duplicate entry/.test(error.message)) return false
+				throw error;
+			})
+
 		return true;
 	},
-	selectById: async (userId) => {
-		return user;
-	},
-	selectBySub: async (sub) => {
-		return user;
-	},
-	update: async (userId, newProfile) => {
-		return affectedRows === 1;
-	},
-	remove: async (userId) => {
+	select: async (id) => {
+		const user = await getConnection()
+			.then(async connection => {
+				const rows = await connection.execute(
+					'SELECT * FROM user WHERE id = ?',
+					[id]
+				)
 
+				const row = rows[0][0] ?? [];
+				if (!row) return null;
+
+				return {
+					id: row['id'],
+					nickname: row['nickname'],
+					email: row['email'],
+					gender: row['gender'],
+					birthday: row['birthday'],
+					regdate: row['regdate']
+				}
+			})
+			.catch(error => {
+				console.log(error);
+			})
+
+		return user;
+	},
+	update: async (id, newUser) => {
+		const response = await getConnection()
+			.then(async connection => {
+				const ok = await connection.execute(
+					'UPDATE user SET nickname = ?, gender = ?, birthday = ? WHERE id = ?',
+					[newUser.nickname, newUser.gender, newUser.birthday, id]
+				)
+				return ok[0];
+			})
+			.catch(error => {
+				console.log(error);
+			})
+
+		return response.affectedRows === 1;
+	},
+	remove: async (id) => {
+		await getConnection()
+			.then(async connection => {
+				await connection.execute(
+					'DELETE FROM user WHERE id = ?',
+					[id]
+				)
+			})
+			.catch(error => {
+				console.log(error);
+			})
 	}
 }

@@ -1,11 +1,11 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai')
-const OpenAI = require('openai')
+//const OpenAI = require('openai')
 
-// const genAI = new GoogleGenerativeAI(process.env.google_api_key)
-// const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+const genAI = new GoogleGenerativeAI(process.env.google_api_key)
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
-const { chat } = require('./config.json');
-const openai = new OpenAI({ apiKey: chat.openai_key });
+// const { chat } = require('./config.json');
+// const openai = new OpenAI({ apiKey: chat.openai_key });
 
 exports.gemini = async (prompt) => {
 	console.log(prompt)
@@ -23,16 +23,16 @@ exports.gemini = async (prompt) => {
 	return response
 }
 
-exports.gpt = async (prompt, model="gpt-3.5-turbo") => {
-	const completion = await openai.chat.completions.create({
-		model: model,
-		messages: [
-			{
-				role: "user",
-				content: prompt
-			}
-		]
-	})
+// exports.gpt = async (prompt, model="gpt-3.5-turbo") => {
+// 	const completion = await openai.chat.completions.create({
+// 		model: model,
+// 		messages: [
+// 			{
+// 				role: "user",
+// 				content: prompt
+// 			}
+// 		]
+// 	})
 
-	return completion
-}
+// 	return completion
+// }
