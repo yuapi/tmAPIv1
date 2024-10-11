@@ -36,63 +36,129 @@ functions:
       - http:
           path: /v1/hello
           method: GET
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+            claims:
+              - email
+              - identities
   listPosts:
     handler: postHandler.listPosts
     events:
       - http:
           path: /v1/post
           method: GET
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+            claims:
+              - email
+              - identities
   createPost:
     handler: postHandler.createPost
     events:
       - http:
           path: /v1/post
           method: POST
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+            claims:
+              - email
+              - identities
   readPost:
     handler: postHandler.readPost
     events:
       - http:
           path: /v1/post/{id}
           method: GET
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+            claims:
+              - email
+              - identities
   updatePost:
     handler: postHandler.updatePost
     events:
       - http:
           path: /v1/post/{id}
           method: PUT
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+            claims:
+              - email
+              - identities
   deletePost:
     handler: postHandler.deletePost
     events:
       - http:
           path: /v1/post/{id}
           method: DELETE
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+            claims:
+              - email
+              - identities
   createUser:
     handler: userHandler.createUser
     events:
       - http:
           path: /v1/user
           method: POST
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+            claims:
+              - email
+              - identities
   readUser:
     handler: userHandler.readUser
     events:
       - http:
           path: /v1/user/{id}
           method: GET
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+            claims:
+              - email
+              - identities
   updateUser:
     handler: userHandler.updateUser
     events:
       - http:
           path: /v1/user/{id}
           method: PUT
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+            claims:
+              - email
+              - identities
   deleteUser:
     handler: userHandler.deleteUser
     events:
       - http:
           path: /v1/user/{id}
           method: DELETE
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+            claims:
+              - email
+              - identities
   chat:
     handler: chatHandler.chat
     events:
       - http:
           path: /v1/chat
           method: POST
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+            claims:
+              - email
+              - identities
