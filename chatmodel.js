@@ -1,14 +1,20 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai')
 const { BedrockRuntimeClient, InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
 
-// const { chat } = require('./config.json');
-// const openai = new OpenAI({ apiKey: chat.openai_key });
+async function createGoogleSession(userid, prev=null) {
+	chatSession[userid] = model.startChat({ history: prev ?? [] })
+	return true;
+}
 
-exports.google = async (prompt, model='gemini-1.5-flash') => {
+exports.google = async (prompt, prev=null) => {
 	console.log(prompt)
 	const genAI = new GoogleGenerativeAI(process.env.google_api_key)
-	const model = genAI.getGenerativeModel({ model: model })
+	const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
+	// if (!chatSession['userid']) await createGoogleSession(userid, prev)
+	// const chat = chatSession['userid'];
+
+	// const result = await chat.sendMessage(prompt)
 	const result = await model.generateContent(prompt)
 	const content = await result.response.text().replace(/\*/g, '')
 	
@@ -46,7 +52,7 @@ exports.bedrock = async (prompt, prev=null, model='anthropic.claude-3-haiku-2024
 		body: Buffer.from(JSON.stringify(body)),
 		contentType: "application/json",
 		accept: "application/json",
-		modelId: "anthropic.claude-3-haiku-20240307-v1:0",
+		modelId: model,
 		trace: "ENABLED"
 	}
 

@@ -1,5 +1,5 @@
 exports.hello = async (event) => {
-  console.log(event);
+  console.log(event.cognitoPoolClaims);
   return {
     statusCode: 200,
     body: JSON.stringify({

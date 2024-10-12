@@ -1,4 +1,6 @@
-const { gemini } = require('./chatmodel.js')
+const { google, bedrock } = require('./chatmodel.js')
+
+const models = ["gemini-1.5-flash", "claude-3-haiku"];
 
 exports.getSession = async (event) => {
 	return {
@@ -21,8 +23,20 @@ exports.deleteSession = async (event) => {
 exports.chat = async (event) => {
 	if (!event.body) return { statusCode: 404 };
 
-	const { prompt } = JSON.parse(event.body);
-	const response = await gemini(prompt);
+	const { model, prompt, prev } = event.body;
+	console.log(event.cognitoPoolClaims)
+	const userid = event.cognitoPoolClaims.identities.userid;
+	if (!model || models.indexOf(model) === -1) return { statusCode: 400 }
+
+	let response;
+	const modelNo = models.indexOf(model);
+
+	if (modelNo === 0) {
+		response = await google(prompt)
+	} 
+	else if (modelNo === 1) {
+		response = await bedrock(prompt)
+	}
 
 	return {
 		statusCode: 200,

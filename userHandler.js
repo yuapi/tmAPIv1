@@ -15,9 +15,10 @@ exports.createUser = async (event) => {
 }
 
 exports.readUser = async (event) => {
-	if (!event.pathParameters || !event.pathParameters["id"]) return { statusCode: 404 };
+	console.log(event)
+	if (!event.path || !event.path["id"]) return { statusCode: 404 };
 
-	const user = await userdb.select(event.pathParameters.id);
+	const user = await userdb.select(event.path.id);
 	if (!user) return { statusCode: 400 };
 
 	return {
