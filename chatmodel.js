@@ -11,10 +11,6 @@ exports.google = async (prompt, prev=null) => {
 	const genAI = new GoogleGenerativeAI(process.env.google_api_key)
 	const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
-	// if (!chatSession['userid']) await createGoogleSession(userid, prev)
-	// const chat = chatSession['userid'];
-
-	// const result = await chat.sendMessage(prompt)
 	const result = await model.generateContent(prompt)
 	const content = await result.response.text().replace(/\*/g, '')
 	
@@ -57,10 +53,19 @@ exports.bedrock = async (prompt, prev=null, model='anthropic.claude-3-haiku-2024
 	}
 
 	const command = new InvokeModelCommand(input);
-	const response = await client.send(command);
-	const decode = Buffer.from(response.body).toString();
+	const result = await client.send(command);
+	const decode = Buffer.from(result.body).toString();
+	const data = JSON.parse(decode)
 
-	return JSON.parse(decode)
+	const now = new Date()
+	const timestamp = `${now.getHours()}:${now.getMinutes()}`
+
+	const response = {
+		content: data.content[0].text,
+		timestamp: timestamp,
+		role: 'assistant'
+	}
+	return response
 }
 
 // exports.gpt = async (prompt, model="gpt-3.5-turbo") => {

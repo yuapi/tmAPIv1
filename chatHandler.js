@@ -1,6 +1,6 @@
 const { google, bedrock } = require('./chatmodel.js')
 
-const models = ["gemini-1.5-flash", "claude-3-haiku"];
+const models = ["Gemini-1.5-flash", "Claude-3-haiku"];
 
 exports.getSession = async (event) => {
 	return {
