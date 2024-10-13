@@ -25,7 +25,8 @@ exports.postdb = {
 				await connection.execute(
 					'INSERT INTO post (userid, title, content, created, modified) VALUES (?, ?, ?, CURRENT_TIMESTAMP(), NULL)',
 					[post.userid, post.title, post.content]
-				)
+				);
+				await connection.end();
 			})
 			.catch(error => {
 				if (/Duplicate entry/.test(error.message)) return false
@@ -41,6 +42,7 @@ exports.postdb = {
 					'SELECT * FROM post WHERE id = ?',
 					[id]
 				);
+				await connection.end();
 	
 				const row = rows[0][0] ?? [];
 				if (!row) return null;
@@ -66,7 +68,9 @@ exports.postdb = {
 				const ok = await connection.execute(
 					'UPDATE post SET title = ?, content = ?, modified = CURRENT_TIMESTAMP() WHERE id = ?',
 					[newPost.title, newPost.content, id]
-				)
+				);
+				await connection.end();
+
 				return ok[0];
 			})
 			.catch(error => {
@@ -81,7 +85,8 @@ exports.postdb = {
 				await connection.execute(
 					'DELETE FROM post WHERE id = ?',
 					[id]
-				)
+				);
+				await connection.end();
 			})
 			.catch(error => {
 				console.log(error);
@@ -92,7 +97,8 @@ exports.postdb = {
 			.then(async connection => {
 				const rows = await connection.execute(
 					'SELECT * FROM post ORDER BY created DESC'
-				)
+				);
+				await connection.end();
 	
 				return (rows[0] ?? []).map(row => ({
 					id: row['id'],
@@ -118,7 +124,8 @@ exports.userdb = {
 				await connection.execute(
 					'INSERT INTO user (id, nickname, email, gender, birthday, regdate) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP())',
 					[user.id, user.nickname, user.email, user.gender, user.birthday]
-				)
+				);
+				await connection.end();
 			})
 			.catch(error => {
 				if (/Duplicate entry/.test(error.message)) return false
@@ -133,7 +140,8 @@ exports.userdb = {
 				const rows = await connection.execute(
 					'SELECT * FROM user WHERE id = ?',
 					[id]
-				)
+				);
+				await connection.end();
 
 				const row = rows[0][0] ?? [];
 				if (!row) return null;
@@ -159,7 +167,9 @@ exports.userdb = {
 				const ok = await connection.execute(
 					'UPDATE user SET nickname = ?, gender = ?, birthday = ? WHERE id = ?',
 					[newUser.nickname, newUser.gender, newUser.birthday, id]
-				)
+				);
+				await connection.end();
+
 				return ok[0];
 			})
 			.catch(error => {
@@ -174,10 +184,51 @@ exports.userdb = {
 				await connection.execute(
 					'DELETE FROM user WHERE id = ?',
 					[id]
-				)
+				);
+				await connection.end();
 			})
 			.catch(error => {
 				console.log(error);
 			})
+	}
+}
+
+exports.countrydb = {
+	insert: async (countries) => {
+		console.log(countries)
+		await getConnection()
+			.then(async connection => {
+				await connection.query(
+					'INSERT INTO country (name, description, continent) VALUES ?',
+					[countries]
+				);
+				await connection.end();
+			})
+			.catch(error => {
+				if (/Duplicate entry/.test(error.message)) return false
+				throw error;
+			})
+
+		return true;
+	},
+	select: async (name) => {
+		const country = await getConnection()
+			.then(async connection => {
+				const rows = await connection.execute(
+					'SELECT * FROM country WHERE name = ?',
+					[name]
+				);
+				await connection.end()
+
+				const row = rows[0][0] ?? [];
+				if (!row) return null;
+
+				return row
+			})
+			.catch(error => {
+				console.log(error);
+			})
+
+		return country;
 	}
 }
