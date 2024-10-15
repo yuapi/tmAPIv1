@@ -30,3 +30,13 @@ exports.readCountry = async (event) => {
 		body: JSON.stringify(country),
 	};
 }
+
+exports.listCountry = async (event) => {
+	const country = await countrydb.list();
+	if (!country.length) return { statusCode: 400 };
+
+	return {
+		statusCode: 200,
+		body: JSON.stringify(country),
+	};
+}

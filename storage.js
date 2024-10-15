@@ -230,5 +230,21 @@ exports.countrydb = {
 			})
 
 		return country;
+	},
+	list: async() => {
+		const countries = await getConnection()
+			.then(async connection => {
+				const rows = await connection.execute(
+					'SELECT * FROM country'
+				);
+				await connection.end()
+
+				return (rows[0] ?? [])
+			})
+			.catch(error => {
+				console.log(error);
+			})
+
+		return countries;
 	}
 }
