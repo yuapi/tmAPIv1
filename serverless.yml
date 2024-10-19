@@ -166,16 +166,17 @@ functions:
     handler: countryHandler.createCountry
     events:
       - http:
-          path: /v1/country
+          path: /v1/country/dev
           method: POST
   readCountry:
     handler: countryHandler.readCountry
     events:
       - http:
           path: /v1/country
+          method: POST
+  listCountry:
+    handler: countryHandler.listCountry
+    events:
+      - http:
+          path: /v1/country/list
           method: GET
-          integration: lambda
-          authorizer:
-            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
-            claims:
-              - email

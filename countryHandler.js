@@ -20,23 +20,23 @@ exports.createCountry = async (event) => {
 }
 
 exports.readCountry = async (event) => {
-	if (!event.query || !event.query["name"]) return { statusCode: 404 };
+	if (!event.body || !event.body["names"]) return { statusCode: 404 };
 
-	const country = await countrydb.select(event.query.name);
-	if (!country) return { statusCode: 400 };
+	const countries = await countrydb.select(event.body.names);
+	if (!countries.length) return { statusCode: 400 };
 
 	return {
 		statusCode: 200,
-		body: JSON.stringify(country),
+		body: JSON.stringify(countries),
 	};
 }
 
 exports.listCountry = async (event) => {
-	const country = await countrydb.list();
-	if (!country.length) return { statusCode: 400 };
+	const countries = await countrydb.list();
+	if (!countries.length) return { statusCode: 400 };
 
 	return {
 		statusCode: 200,
-		body: JSON.stringify(country),
+		body: JSON.stringify(countries),
 	};
 }

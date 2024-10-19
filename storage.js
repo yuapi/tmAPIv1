@@ -211,19 +211,18 @@ exports.countrydb = {
 
 		return true;
 	},
-	select: async (name) => {
+	select: async (names) => {
+		if (!names.length) return [];
+
 		const country = await getConnection()
 			.then(async connection => {
-				const rows = await connection.execute(
-					'SELECT * FROM country WHERE name = ?',
-					[name]
+				const rows = await connection.query(
+					'SELECT * FROM country WHERE name in (?)',
+					[names]
 				);
 				await connection.end()
 
-				const row = rows[0][0] ?? [];
-				if (!row) return null;
-
-				return row
+				return (rows[0] ?? [])
 			})
 			.catch(error => {
 				console.log(error);
