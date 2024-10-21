@@ -112,34 +112,22 @@ exports.userdb = {
 		}
 	},
 	update: async (id, newUser) => {
-		const response = await getConnection()
-			.then(async connection => {
-				const ok = await connection.execute(
-					'UPDATE user SET nickname = ?, gender = ?, birthday = ? WHERE id = ?',
-					[newUser.nickname, newUser.gender, newUser.birthday, id]
-				);
-				await connection.end();
-
-				return ok[0];
-			})
-			.catch(error => {
-				console.log(error);
-			})
-
-		return response.affectedRows === 1;
+		try {
+			const results = await executeQuery('UPDATE user SET nickname = ?, gender = ?, birthday = ? WHERE id = ?', [newUser.nickname, newUser.gender, newUser.birthday, id]);
+			console.log(results);
+			return results.affectedRows === 1;
+		} catch (error) {
+			console.error('Error from userdb.update:', error);
+		}
 	},
 	remove: async (id) => {
-		await getConnection()
-			.then(async connection => {
-				await connection.execute(
-					'DELETE FROM user WHERE id = ?',
-					[id]
-				);
-				await connection.end();
-			})
-			.catch(error => {
-				console.log(error);
-			})
+		try {
+			const results = await executeQuery('DELETE FROM user WHERE id = ?', [id]);
+			console.log(results);
+			return results.affectedRows === 1;
+		} catch (error) {
+			console.error('Error from userdb.remove:', error);
+		}
 	}
 }
 

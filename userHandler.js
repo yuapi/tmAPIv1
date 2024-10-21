@@ -15,23 +15,26 @@ exports.readUser = async (event) => {
 }
 
 exports.updateUser = async (event) => {
-	if (!event.body || !event.pathParameters || !event.pathParameters["id"]) return { statusCode: 404 };
+	if (!event.cognitoPoolClaims || !event.body) return { statusCode: 404 };
 
-	const id = event.pathParameters.id;
-	const { nickname, gender, birthday } = JSON.parse(event.body);
+	const newUser = {
+		nickname: event.body.nickname,
+		gender: event.body.gender,
+		birthday: event.body.birthday,
+	}
 
-	if (!(await userdb.update(id, { nickname, gender, birthday }))) return { statusCode: 400 };
+	if (!(await userdb.update(event.cognitoPoolClaims.sub, newUser))) return { statusCode: 400 };
 
 	return {
 		statsuCode: 200,
-		body: JSON.stringify({ id })
+		body: JSON.stringify({ id: event.cognitoPoolClaims.sub })
 	};
 }
 
 exports.deleteUser = async (event) => {
-	if (!event.pathParameters || !event.pathParameters["id"]) return { statusCode: 404 };
+	if (!event.cognitoPoolClaims) return { statusCode: 404 };
 
-	await userdb.remove(event.pathParameters.id);
+	await userdb.remove(event.cognitoPoolClaims.sub)
 
 	return { statusCode: 200 };
 }

@@ -117,24 +117,20 @@ functions:
     handler: userHandler.updateUser
     events:
       - http:
-          path: /v1/user/{id}
+          path: /v1/user
           method: PUT
           integration: lambda
           authorizer:
             arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
-            claims:
-              - email
   deleteUser:
     handler: userHandler.deleteUser
     events:
       - http:
-          path: /v1/user/{id}
+          path: /v1/user
           method: DELETE
           integration: lambda
           authorizer:
             arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
-            claims:
-              - email
   chat:
     handler: chatHandler.chat
     events:
@@ -144,8 +140,6 @@ functions:
           integration: lambda
           authorizer:
             arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
-            claims:
-              - email
   createCountry:
     handler: countryHandler.createCountry
     events:
