@@ -41,8 +41,6 @@ functions:
           integration: lambda
           authorizer:
             arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
-            claims:
-              - email
   listPosts:
     handler: postHandler.listPosts
     events:
@@ -52,8 +50,6 @@ functions:
           integration: lambda
           authorizer:
             arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
-            claims:
-              - email
   createPost:
     handler: postHandler.createPost
     events:
@@ -63,8 +59,6 @@ functions:
           integration: lambda
           authorizer:
             arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
-            claims:
-              - email
   readPost:
     handler: postHandler.readPost
     events:
@@ -74,8 +68,6 @@ functions:
           integration: lambda
           authorizer:
             arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
-            claims:
-              - email
   updatePost:
     handler: postHandler.updatePost
     events:
@@ -85,8 +77,6 @@ functions:
           integration: lambda
           authorizer:
             arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
-            claims:
-              - email
   deletePost:
     handler: postHandler.deletePost
     events:
@@ -96,8 +86,24 @@ functions:
           integration: lambda
           authorizer:
             arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
-            claims:
-              - email
+  listComments:
+    handler: commentHandler.listComments
+    events:
+      - http:
+          path: /v1/comment/{pid}
+          method: GET
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+  createComment:
+    handler: commentHandler.createComment
+    events:
+      - http:
+          path: /v1/comment
+          method: POST
+          integration: lambda
+          authorizer:
+            arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
   readUser:
     handler: userHandler.readUser
     events:

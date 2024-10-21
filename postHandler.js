@@ -9,17 +9,17 @@ exports.createPost = async (event) => {
 		content: event.body.content,
 	}
 
-	const res = await postdb.insert(post);
-	if (!res) return { statusCode: 400 };
+	const id = await postdb.insert(post);
+	if (!id) return { statusCode: 400 };
 
 	return {
 		statusCode: 200,
-		body: JSON.stringify({ res, title })
+		body: JSON.stringify({ id })
 	};
 }
 
 exports.readPost = async (event) => {
-	if (!event.path || !event.path["id"]) return { statusCode: 404 };
+	if (!event.cognitoPoolClaims || !event.path || !event.path["id"]) return { statusCode: 404 };
 
 	const post = await postdb.select(event.path.id);
 	if (!post) return { statusCode: 400 };
@@ -31,12 +31,14 @@ exports.readPost = async (event) => {
 }
 
 exports.updatePost = async (event) => {
-	if (!event.body || !event.pathParameters || !event.pathParameters["id"]) return { statusCode: 404 };
+	if (!event.cognitoPoolClaims || !event.body || !event.path || !event.path["id"]) return { statusCode: 404 };
 
-	const id = event.pathParameters.id;
-	const { title, content } = JSON.parse(event.body);
+	const newPost = {
+		title: event.body.title,
+		content: event.body.content,
+	}
 
-	if (!(await postdb.update(id, { title, content }))) return { statusCode: 400 };
+	if (!(await postdb.update(event.path.id, event.cognitoPoolClaims.sub, newPost))) return { statusCode: 400 };
 
 	return {
 		statusCode: 200,
@@ -45,9 +47,9 @@ exports.updatePost = async (event) => {
 }
 
 exports.deletePost = async (event) => {
-	if (!event.pathParameters || !event.pathParameters["id"]) return { statusCode: 404 };
+	if (!event.cognitoPoolClaims || !event.path || !event.path["id"]) return { statusCode: 404 };
 
-	await postdb.remove(event.pathParameters.id);
+	if (!(await postdb.remove(event.path.id, event.cognitoPoolClaims.sub))) return { statusCode: 400 };
 
 	return { statusCode: 200 };
 }

@@ -12,25 +12,6 @@ const pool = createPool({
 	queueLimit: 0
 })
 
-// function getConnection() {
-// 	return new Promise((resolve, reject) => {
-// 		setTimeout(async () => {
-// 			const connection = await connectionPromise;
-// 			resolve(connection);
-// 		}, 1000);
-// 	});
-// }
-
-// async function getConnection() {
-// 	try {
-// 		const connection = await pool.getConnection();
-// 		return connection;
-// 	} catch (error) {
-// 		console.error('Error from getting connection from pool:', error);
-// 		throw error;
-// 	}
-// }
-
 async function executeQuery(sql, params=[]) {
 	let conn;
 	try {
@@ -53,24 +34,10 @@ exports.postdb = {
 				[post.userid, post.title, post.content]
 			);
 			console.log(results);
-			return true;
+			return results.insertId;
 		} catch (error) {
 			console.error('Error from postdb.insert:', error);
 		}
-		// await getConnection()
-		// 	.then(async connection => {
-		// 		await connection.execute(
-		// 			'INSERT INTO post (userid, title, content, created, modified) VALUES (?, ?, ?, CURRENT_TIMESTAMP(), NULL)',
-		// 			[post.userid, post.title, post.content]
-		// 		);
-		// 		await connection.end();
-		// 	})
-		// 	.catch(error => {
-		// 		if (/Duplicate entry/.test(error.message)) return false
-		// 		throw error;
-		// 	})
-	
-		// return true;
 	},
 	select: async (id) => {
 		try {
@@ -80,68 +47,24 @@ exports.postdb = {
 		} catch (error) {
 			console.error('Error from postdb.select:', error);
 		}
-		// const post = await getConnection()
-		// 	.then(async connection => {
-		// 		const rows = await connection.execute(
-		// 			'SELECT * FROM post WHERE id = ?',
-		// 			[id]
-		// 		);
-		// 		await connection.end();
-	
-		// 		const row = rows[0][0] ?? [];
-		// 		if (!row) return null;
-	
-		// 		return {
-		// 			id: row['id'],
-		// 			userid: row['userid'],
-		// 			title: row['title'],
-		// 			content: row['content'],
-		// 			created: row['created'],
-		// 			modified: row['modified']
-		// 		}
-		// 	})
-		// 	.catch(error => {
-		// 		console.log(error);
-		// 	})
-	
-		// return post;
 	},
-	update: async (id, newPost) => {
+	update: async (id, userid, newPost) => {
 		try {
-			const results = await executeQuery('UPDATE post SET title = ?, content = ?, modified = CURRENT_TIMESTAMP() WHERE id = ?', [newPost.title, newPost.content, id]);
+			const results = await executeQuery('UPDATE post SET title = ?, content = ?, modified = CURRENT_TIMESTAMP() WHERE id = ? AND userid = ?', [newPost.title, newPost.content, id, userid]);
 			console.log(results);
-			return results[0];
+			return results.affectedRows === 1;
 		} catch (error) {
 			console.error('Error from postdb.update:', error);
 		}
-		// const response = await getConnection()
-		// 	.then(async connection => {
-		// 		const ok = await connection.execute(
-		// 			'UPDATE post SET title = ?, content = ?, modified = CURRENT_TIMESTAMP() WHERE id = ?',
-		// 			[newPost.title, newPost.content, id]
-		// 		);
-		// 		await connection.end();
-
-		// 		return ok[0];
-		// 	})
-		// 	.catch(error => {
-		// 		console.log(error);
-		// 	})
-			
-		// return response.affectedRows === 1;
 	},
-	remove: async (id) => {
-		await getConnection()
-			.then(async connection => {
-				await connection.execute(
-					'DELETE FROM post WHERE id = ?',
-					[id]
-				);
-				await connection.end();
-			})
-			.catch(error => {
-				console.log(error);
-			})
+	remove: async (id, userid) => {
+		try {
+			const results = await executeQuery('DELETE FROM post WHERE id = ? AND userid = ?', [id, userid]);
+			console.log(results);
+			return results.affectedRows === 1;
+		} catch (error) {
+			console.error('Error from postdb.remove:', error);
+		}
 	},
 	list: async () => {
 		try {
@@ -151,26 +74,30 @@ exports.postdb = {
 		} catch (error) {
 			console.error('Error from postdb.list:', error);
 		}
-		// const posts = await getConnection()
-		// 	.then(async connection => {
-		// 		const rows = await connection.execute(
-		// 			'SELECT post.id, post.userid, user.nickname, post.title, post.created FROM post INNER JOIN user ON post.userid = user.id ORDER BY post.id DESC'
-		// 		);
-		// 		await connection.end();
-	
-		// 		return (rows[0] ?? []).map(row => ({
-		// 			id: row['id'],
-		// 			userid: row['userid'],
-		// 			author: row['nickname'],
-		// 			title: row['title'],
-		// 			created: row['created'],
-		// 		}))
-		// 	})
-		// 	.catch(error => {
-		// 		console.log(error);
-		// 	})
-	
-		// return posts;
+	}
+}
+
+exports.commentdb = {
+	insert: async (comment) => {
+		try {
+			const results = await executeQuery(
+				'INSERT INTO comment (postid, userid, content, created) VALUES (?, ?, ?, CURRENT_TIMESTAMP())', 
+				[comment.postid, comment.userid, comment.content]
+			);
+			console.log(results);
+			return results.insertId;
+		} catch (error) {
+			console.error('Error from commentdb.insert:', error);
+		}
+	},
+	list: async (postid) => {
+		try {
+			const results = await executeQuery('SELECT comment.id, user.nickname AS author, comment.content, comment.created FROM comment INNER JOIN user ON comment.userid = user.id WHERE comment.postid = ? ORDER BY comment.id DESC', [postid]);
+			console.log(results);
+			return results;
+		} catch (error) {
+			console.error('Error from commentdb.list:', error);
+		}
 	}
 }
 
