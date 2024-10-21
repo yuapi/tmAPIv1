@@ -1,5 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai')
 const { BedrockRuntimeClient, InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
+const OpenAI = require('openai');
 
 async function createGoogleSession(userid, prev=null) {
 	chatSession[userid] = model.startChat({ history: prev ?? [] })
@@ -8,10 +9,11 @@ async function createGoogleSession(userid, prev=null) {
 
 exports.google = async (prompt, prev=null) => {
 	console.log(prompt)
-	const genAI = new GoogleGenerativeAI(process.env.google_api_key)
-	const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
-	const result = await model.generateContent(prompt)
+	const googleAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY)
+	const gemini = googleAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+
+	const result = await gemini.generateContent(prompt)
 	const content = await result.response.text().replace(/\*/g, '')
 	
 	const now = new Date()
@@ -68,6 +70,55 @@ exports.bedrock = async (prompt, prev=null, model='anthropic.claude-3-haiku-2024
 	return response
 }
 
+exports.perplexity = async(prompt, prev=null, model='llama-3.1-sonar-small-128k-online') => {
+	console.log(prompt);
+	const perplexity = new OpenAI({
+		apiKey: process.env.PERPLEXITY_API_KEY || '',
+		baseURL: 'https://api.perplexity.ai/',
+	});
+
+	const response = await perplexity.chat.completions.create({
+		model: model,
+		messages: [
+			{ role: 'user', content: prompt }
+		],
+		max_tokens: 1000,
+		stream: false
+	});
+
+	const now = new Date()
+	const timestamp = `${now.getHours()}:${now.getMinutes()}`
+
+	const result = {
+		content: response.choices[0].message.content,
+		timestamp: timestamp,
+		role: 'assistant'
+	}
+	return result;
+}
+
+exports.openai = async(prompt, prev=null, model='gpt-4o-mini-2024-07-18') => {
+	console.log(prompt);
+	const openai = new OpenAI({
+		apiKey: process.env.OPENAI_API_KEY
+	});
+
+	const response = await openai.chat.completions.create({
+        model: model,
+        messages: [{ role: "user", content: prompt }],
+        stream: false,
+    });
+
+	const now = new Date()
+	const timestamp = `${now.getHours()}:${now.getMinutes()}`
+
+	const result = {
+		content: response.choices[0].message.content,
+		timestamp: timestamp,
+		role: 'assistant'
+	}
+	return result;
+}
 // exports.gpt = async (prompt, model="gpt-3.5-turbo") => {
 // 	const completion = await openai.chat.completions.create({
 // 		model: model,

@@ -1,11 +1,15 @@
 const { postdb } = require('./storage.js');
 
 exports.createPost = async (event) => {
-	if (!event.body) return { statusCode: 404 };
+	if (!event.cognitoPoolClaims || !event.body) return { statusCode: 404 };
 
-	const { userid, title, content } = JSON.parse(event.body);
+	const post = {
+		userid: event.cognitoPoolClaims.sub,
+		title: event.body.title,
+		content: event.body.content,
+	}
 
-	const res = await postdb.insert({ userid, title, content });
+	const res = await postdb.insert(post);
 	if (!res) return { statusCode: 400 };
 
 	return {
@@ -15,9 +19,9 @@ exports.createPost = async (event) => {
 }
 
 exports.readPost = async (event) => {
-	if (!event.pathParameters || !event.pathParameters["id"]) return { statusCode: 404 };
+	if (!event.path || !event.path["id"]) return { statusCode: 404 };
 
-	const post = await postdb.select(event.pathParameters.id);
+	const post = await postdb.select(event.path.id);
 	if (!post) return { statusCode: 400 };
 
 	return {

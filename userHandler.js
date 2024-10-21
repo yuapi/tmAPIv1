@@ -1,24 +1,11 @@
 const { userdb } = require('./storage.js');
 
-exports.createUser = async (event) => {
-	if (!event.body) return { statusCode: 404 };
-
-	const { user } = JSON.parse(event.body);
-	
-	const res = await userdb.insert(user);
-	if (!res) return { statusCode: 400 };
-
-	return {
-		statusCode: 200,
-		body: JSON.stringify({ res, user })
-	};
-}
-
 exports.readUser = async (event) => {
 	console.log(event)
-	if (!event.path || !event.path["id"]) return { statusCode: 404 };
-
-	const user = await userdb.select(event.path.id);
+	if (!event.cognitoPoolClaims) return { statusCode: 404 };
+	console.log(event.cognitoPoolClaims.sub)
+	const user = await userdb.select(event.cognitoPoolClaims.sub);
+	console.log(user);
 	if (!user) return { statusCode: 400 };
 
 	return {
