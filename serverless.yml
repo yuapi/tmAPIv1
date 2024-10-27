@@ -30,6 +30,8 @@ provider:
     GOOGLE_API_KEY: ${self:custom.config.chat.google_key}
     PERPLEXITY_API_KEY: ${self:custom.config.chat.perplexity_key}
     OPENAI_API_KEY: ${self:custom.config.chat.openai_key}
+    UNSPLASH_API_KEY: ${self:custom.config.image.unsplash_key}
+    PIXABAY_API_KEY: ${self:custom.config.image.pixabay_key}
 
 functions:
   hello:
@@ -140,6 +142,12 @@ functions:
           integration: lambda
           authorizer:
             arn: arn:aws:cognito-idp:ap-northeast-2:975050034108:userpool/ap-northeast-2_XGR8vNEfF
+  getImages:
+    handler: imageHandler.getImages
+    events:
+      - http:
+          path: /v1/images
+          method: POST
   createCountry:
     handler: countryHandler.createCountry
     events:
