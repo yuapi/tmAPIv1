@@ -17,11 +17,11 @@ async function getImage(query) {
   if (unsplashRequests < UNSPLASH_LIMIT) {
     try {
       const response = await axios.get('https://api.unsplash.com/search/photos', {
-        params: { query },
+        params: { query: query, lang: 'ko' },
         headers: { Authorization: `Client-ID ${UNSPLASH_API_KEY}` }
       });
       unsplashRequests++;
-      return response.data.results;
+      return response.data.results[0].urls.small;
     } catch (error) {
       console.error('Unsplash API error:', error);
     }
@@ -31,7 +31,7 @@ async function getImage(query) {
     const response = await axios.get('https://pixabay.com/api/', {
       params: { key: PIXABAY_API_KEY, q: query }
     });
-    return response.data.hits;
+    return response.data.hits[0].webformatURL;
   } catch (error) {
     console.error('Pixabay API error:', error);
     throw error;
@@ -42,14 +42,16 @@ exports.getImages = async (event) => {
 	console.log(event)
 	if (!event.cognitoPoolClaims || !event.body) return { statusCode: 404 };
 	
-	console.log(event.body.query);
+	const { query } = event.body;
 
 	try {
-		if (event.body.query.length < 3) throw new Error("최소 갯수 부족. 잘못된 요청");
+		if (query.length < 3) throw new Error("최소 갯수 부족. 잘못된 요청");
 
 		const images = []
-		for (q in event.body.query) {
+		for (let q of query) {
+      console.log(q)
 			const image = await getImage(q)
+      console.log(image);
 			images.push(image);
 		}
 
